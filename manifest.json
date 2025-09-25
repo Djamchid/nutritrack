@@ -1,0 +1,102 @@
+{
+  "name": "NutriTrack - Suivi Nutrition",
+  "short_name": "NutriTrack",
+  "description": "Application de suivi nutritionnel pour micronutriments et macronutriments",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#667eea",
+  "theme_color": "#6366f1",
+  "orientation": "portrait",
+  "scope": "/",
+  "categories": ["health", "fitness", "lifestyle"],
+  "lang": "fr-FR",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/home.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "label": "Écran d'accueil - Suivi quotidien"
+    },
+    {
+      "src": "screenshots/week.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "label": "Vue hebdomadaire"
+    },
+    {
+      "src": "screenshots/settings.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "label": "Paramètres et objectifs"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Ajouter un repas",
+      "short_name": "Repas",
+      "description": "Ajouter rapidement un repas",
+      "url": "/index.html?action=add-meal",
+      "icons": [{ "src": "icons/meal.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Vue semaine",
+      "short_name": "Semaine",
+      "description": "Voir le résumé hebdomadaire",
+      "url": "/index.html?tab=week",
+      "icons": [{ "src": "icons/week.png", "sizes": "96x96" }]
+    }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": []
+}

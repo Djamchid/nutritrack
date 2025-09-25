@@ -1,0 +1,51 @@
+// app/build.gradle pour TWA (Trusted Web Activity)
+
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 34
+    buildToolsVersion "34.0.0"
+    
+    defaultConfig {
+        applicationId "com.nutritrack.app"
+        minSdkVersion 21
+        targetSdkVersion 34
+        versionCode 1
+        versionName "1.0.0"
+        
+        // URL de votre PWA
+        manifestPlaceholders = [
+            hostName: "nutritrack.votre-domaine.com",
+            defaultUrl: "https://nutritrack.votre-domaine.com",
+            launcherName: "NutriTrack",
+            assetStatements: '[{ "relation": ["delegate_permission/common.handle_all_urls"], ' +
+                    '"target": {"namespace": "web", "site": "https://nutritrack.votre-domaine.com"}}]'
+        ]
+        
+        // Configuration TWA
+        resValue "string", "app_name", "NutriTrack"
+        resValue "string", "cros_web_fallback_url", "https://nutritrack.votre-domaine.com"
+        resValue "color", "colorPrimary", "#6366f1"
+        resValue "color", "colorPrimaryDark", "#4f46e5"
+        resValue "color", "navigationColor", "#6366f1"
+        resValue "color", "backgroundColor", "#667eea"
+    }
+    
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
+    implementation 'androidx.browser:browser:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+}
