@@ -6,38 +6,20 @@
     <title>NutriTrack - Suivi Nutrition</title>
     
     <!-- PWA Meta Tags -->
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#6366f1">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="NutriTrack">
-
+    
     <!-- iOS specific -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="NutriTrack">
-    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png">
-    <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-167x167.png">
-
-    <!-- Splash screens iOS -->
-    <link rel="apple-touch-startup-image" href="/icons/splash-640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)">
-    <link rel="apple-touch-startup-image" href="/icons/splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)">
-    <link rel="apple-touch-startup-image" href="/icons/splash-1125x2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)">
-    <link rel="apple-touch-startup-image" href="/icons/splash-1242x2208.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)">
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16x16.png">
-    <link rel="shortcut icon" href="/icons/favicon.ico">
-
-    <!-- SEO et Open Graph -->
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    
+    <!-- SEO -->
     <meta name="description" content="Suivez facilement vos macronutriments et micronutriments. Application 100% offline pour un suivi nutritionnel simple et efficace.">
-    <meta property="og:title" content="NutriTrack - Suivi Nutrition">
-    <meta property="og:description" content="Suivez facilement vos macronutriments et micronutriments">
-    <meta property="og:image" content="/icons/icon-512x512.png">
-    <meta property="og:type" content="website">
-
+    
     <style>
         * {
             margin: 0;
@@ -888,24 +870,6 @@
         </div>
     </div>
 
-    <!-- Bouton de partage (optionnel) -->
-    <button id="share-button" onclick="shareProgress()" style="
-        position: fixed;
-        bottom: 80px;
-        right: 20px;
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        border: none;
-        color: white;
-        font-size: 24px;
-        cursor: pointer;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        display: none;
-        z-index: 9997;
-    ">📤</button>
-
     <script>
         // Constants
         const APP_KEY = 'nutriApp.v1';
@@ -926,241 +890,66 @@
             renderMicroCheckboxes();
             renderFishCheckboxes();
             updateWeekSelector();
-            
-            // Initialiser les fonctionnalités PWA
-            initPWA();
         });
 
-        // PWA Functions
-        function initPWA() {
-            // Enregistrement du Service Worker
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('/service-worker.js')
-                        .then(registration => {
-                            console.log('Service Worker enregistré:', registration.scope);
-                            
-                            // Vérifier les mises à jour
-                            registration.addEventListener('updatefound', () => {
-                                const newWorker = registration.installing;
-                                newWorker.addEventListener('statechange', () => {
-                                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                        // Nouvelle version disponible
-                                        showUpdateNotification();
-                                    }
-                                });
-                            });
-                        })
-                        .catch(error => {
-                            console.error('Erreur Service Worker:', error);
-                        });
-                });
-            }
-
-            // Détection de l'installation PWA
-            let deferredPrompt;
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                
-                // Afficher un bouton d'installation personnalisé
-                showInstallButton();
-            });
-
-            // Gestion du mode offline
-            window.addEventListener('online', () => {
-                console.log('Connexion rétablie');
-                showConnectionStatus('online');
-            });
-
-            window.addEventListener('offline', () => {
-                console.log('Mode hors ligne');
-                showConnectionStatus('offline');
-            });
-
-            // Afficher le bouton de partage si l'API est disponible
-            if (navigator.share) {
-                document.getElementById('share-button').style.display = 'block';
-            }
-
-            // Détection du mode standalone (app installée)
-            if (window.matchMedia('(display-mode: standalone)').matches) {
-                console.log('App lancée en mode standalone');
-                document.body.classList.add('pwa-installed');
-            }
-
-            // Vibration API pour feedback tactile (mobile)
-            const buttons = document.querySelectorAll('.btn-primary, .preset-btn, .nav-btn');
-            buttons.forEach(button => {
-                button.addEventListener('click', () => vibrate([30]));
-            });
-
-            // Gestion des raccourcis depuis le manifest
-            const urlParams = new URLSearchParams(window.location.search);
-            const action = urlParams.get('action');
-            const tab = urlParams.get('tab');
-
-            if (action === 'add-meal') {
-                document.querySelector('.preset-btn').click();
-            } else if (tab === 'week') {
-                showTab('week');
-            }
-        }
-
-        // Notification de mise à jour
-        function showUpdateNotification() {
-            const updateBanner = document.createElement('div');
-            updateBanner.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                padding: 15px 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                z-index: 9999;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                animation: slideUp 0.3s ease-out;
-            `;
-            
-            updateBanner.innerHTML = `
-                <span>🔄 Une nouvelle version est disponible!</span>
-                <button onclick="window.location.reload()" style="
-                    background: white;
-                    color: #667eea;
-                    border: none;
-                    padding: 8px 16px;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    font-weight: 600;
-                ">Actualiser</button>
-            `;
-            
-            document.body.appendChild(updateBanner);
-        }
-
-        // Installation PWA
-        function showInstallButton() {
-            // Ne pas afficher si déjà installé
-            if (window.matchMedia('(display-mode: standalone)').matches) {
-                return;
-            }
-            
-            const installButton = document.createElement('button');
-            installButton.id = 'install-button';
-            installButton.innerHTML = '📱 Installer';
-            installButton.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-                color: white;
-                border: none;
-                padding: 10px 16px;
-                border-radius: 8px;
-                cursor: pointer;
-                font-weight: 600;
-                z-index: 9998;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            `;
-            
-            installButton.onclick = async () => {
-                if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    if (outcome === 'accepted') {
-                        installButton.remove();
-                    }
-                    deferredPrompt = null;
-                }
+        // State Management
+        function getDefaultState() {
+            return {
+                goals: {
+                    cal: 2100,
+                    p: 78,
+                    c: 240,
+                    f: 70,
+                    micro: {
+                        fruits: 2,
+                        veg: 3,
+                        legcere: 1,
+                        calcium: 2,
+                        nuts: 1,
+                        water: 8
+                    },
+                    fishPerWeek: 2
+                },
+                days: {},
+                fish: {}
             };
-            
-            document.body.appendChild(installButton);
         }
 
-        // Statut de connexion
-        function showConnectionStatus(status) {
-            const existingStatus = document.getElementById('connection-status');
-            if (existingStatus) existingStatus.remove();
-            
-            const statusElement = document.createElement('div');
-            statusElement.id = 'connection-status';
-            statusElement.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                padding: 10px;
-                text-align: center;
-                font-weight: 600;
-                z-index: 9999;
-                animation: slideDown 0.3s ease-out;
-            `;
-            
-            if (status === 'online') {
-                statusElement.style.background = '#10b981';
-                statusElement.style.color = 'white';
-                statusElement.textContent = '✓ Connexion rétablie';
-                
-                setTimeout(() => {
-                    statusElement.remove();
-                }, 3000);
-            } else {
-                statusElement.style.background = '#ef4444';
-                statusElement.style.color = 'white';
-                statusElement.textContent = '⚠ Mode hors ligne - Les données sont sauvegardées localement';
-            }
-            
-            document.body.appendChild(statusElement);
-        }
-
-        // Vibration
-        function vibrate(pattern) {
-            if ('vibrate' in navigator) {
-                navigator.vibrate(pattern);
-            }
-        }
-
-        // Partage
-        async function shareProgress() {
-            const dayData = getDayData(currentDate);
-            const calories = calculateCalories(dayData);
-            const progress = Math.round((calories / getGoal('calories')) * 100);
-            
-            const shareText = `🥗 Mon suivi nutritionnel du ${formatDate(currentDate)} : ${calories} kcal (${progress}% de mon objectif)`;
-            
-            if (navigator.share) {
+        function loadState() {
+            const stored = localStorage.getItem(APP_KEY);
+            if (stored) {
                 try {
-                    await navigator.share({
-                        title: 'NutriTrack - Suivi Nutrition',
-                        text: shareText,
-                        url: window.location.href
-                    });
-                } catch (error) {
-                    console.log('Partage annulé');
+                    return JSON.parse(stored);
+                } catch (e) {
+                    console.error('Error loading state:', e);
                 }
-            } else {
-                // Fallback pour les navigateurs sans support
-                navigator.clipboard.writeText(shareText).then(() => {
-                    showAlert('Texte copié dans le presse-papier!', 'success');
-                });
             }
+            return getDefaultState();
         }
 
-        // Application Functions
-        function showTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        function saveState() {
+            localStorage.setItem(APP_KEY, JSON.stringify(appState));
+        }
+
+        function getCurrentDayData() {
+            return appState.days[currentDate] || {
+                micro: { fruits: 0, veg: 0, legcere: 0, calcium: 0, nuts: 0, water: 0 },
+                p: 0, c: 0, f: 0, extra: 0
+            };
+        }
+
+        // Navigation
+        function showTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             
-            document.getElementById(`${tabName}-tab`).classList.add('active');
-            document.querySelector(`.nav-btn[onclick="showTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(`${tab}-tab`).classList.add('active');
+            event.target.classList.add('active');
             
-            if (tabName === 'week') {
+            if (tab === 'week') {
                 loadWeekView();
+            } else if (tab === 'settings') {
+                loadSettings();
             }
         }
 
@@ -1183,308 +972,371 @@
             loadDay();
         }
 
-        function loadDay() {
-            const dayData = getDayData(currentDate);
-            updateDisplay(dayData);
-            updateDateDisplay();
+        function formatDate(dateStr) {
+            const date = new Date(dateStr + 'T00:00:00');
+            const today = new Date().toISOString().split('T')[0];
+            
+            if (dateStr === today) return "Aujourd'hui";
+            
+            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            return date.toLocaleDateString('fr-FR', options);
         }
 
-        function updateDisplay(dayData) {
-            const calories = calculateCalories(dayData);
-            const goalCal = getGoal('calories');
-            const goalP = getGoal('protein');
-            const goalC = getGoal('carbs');
-            const goalF = getGoal('fat');
-
-            document.getElementById('calories-display').textContent = `${calories} kcal`;
-            document.getElementById('protein-display').textContent = `${dayData.p || 0} g`;
-            document.getElementById('carbs-display').textContent = `${dayData.c || 0} g`;
-            document.getElementById('fat-display').textContent = `${dayData.f || 0} g`;
-
-            document.getElementById('calories-progress').style.width = `${Math.min((calories / goalCal) * 100, 100)}%`;
-            document.getElementById('protein-progress').style.width = `${Math.min(((dayData.p || 0) / goalP) * 100, 100)}%`;
-            document.getElementById('carbs-progress').style.width = `${Math.min(((dayData.c || 0) / goalC) * 100, 100)}%`;
-            document.getElementById('fat-progress').style.width = `${Math.min(((dayData.f || 0) / goalF) * 100, 100)}%`;
-
+        // Day View
+        function loadDay() {
+            document.getElementById('current-date').textContent = formatDate(currentDate);
+            
+            const dayData = getCurrentDayData();
+            
+            // Load macros
             document.getElementById('protein-input').value = dayData.p || '';
             document.getElementById('carbs-input').value = dayData.c || '';
             document.getElementById('fat-input').value = dayData.f || '';
             document.getElementById('extra-input').value = dayData.extra || '';
-
-            updateMicroProgress(dayData);
-            updateFishProgress(dayData);
-        }
-
-        function updateDateDisplay() {
-            const today = new Date().toISOString().split('T')[0];
-            const display = document.getElementById('current-date');
             
-            if (currentDate === today) {
-                display.textContent = 'Aujourd\'hui';
-            } else {
-                const date = new Date(currentDate);
-                display.textContent = date.toLocaleDateString('fr-FR', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
-            }
+            // Update displays
+            updateMacroDisplays();
+            
+            // Load micro checkboxes
+            loadMicroCheckboxes();
+            
+            // Load fish checkboxes
+            loadFishCheckboxes();
         }
 
         function saveMacros() {
-            const dayData = getDayData(currentDate);
-            dayData.p = parseInt(document.getElementById('protein-input').value) || 0;
-            dayData.c = parseInt(document.getElementById('carbs-input').value) || 0;
-            dayData.f = parseInt(document.getElementById('fat-input').value) || 0;
-            dayData.extra = parseInt(document.getElementById('extra-input').value) || 0;
+            const dayData = getCurrentDayData();
             
-            setDayData(currentDate, dayData);
-            updateDisplay(dayData);
-            showAlert('Données sauvegardées!', 'success');
+            dayData.p = parseFloat(document.getElementById('protein-input').value) || 0;
+            dayData.c = parseFloat(document.getElementById('carbs-input').value) || 0;
+            dayData.f = parseFloat(document.getElementById('fat-input').value) || 0;
+            dayData.extra = parseFloat(document.getElementById('extra-input').value) || 0;
+            
+            appState.days[currentDate] = dayData;
+            saveState();
+            updateMacroDisplays();
+        }
+
+        function updateMacroDisplays() {
+            const dayData = getCurrentDayData();
+            const goals = appState.goals;
+            
+            // Calculate calories
+            const calories = (dayData.p * 4) + (dayData.c * 4) + (dayData.f * 9) + dayData.extra;
+            
+            // Update displays
+            document.getElementById('calories-display').textContent = `${Math.round(calories)} kcal`;
+            document.getElementById('protein-display').textContent = `${dayData.p} g`;
+            document.getElementById('carbs-display').textContent = `${dayData.c} g`;
+            document.getElementById('fat-display').textContent = `${dayData.f} g`;
+            
+            // Update progress bars
+            document.getElementById('calories-progress').style.width = `${Math.min(100, (calories / goals.cal) * 100)}%`;
+            document.getElementById('protein-progress').style.width = `${Math.min(100, (dayData.p / goals.p) * 100)}%`;
+            document.getElementById('carbs-progress').style.width = `${Math.min(100, (dayData.c / goals.c) * 100)}%`;
+            document.getElementById('fat-progress').style.width = `${Math.min(100, (dayData.f / goals.f) * 100)}%`;
         }
 
         function addPreset(type) {
             const preset = PRESETS[type];
-            const dayData = getDayData(currentDate);
+            const dayData = getCurrentDayData();
             
             dayData.p = (dayData.p || 0) + preset.p;
             dayData.c = (dayData.c || 0) + preset.c;
             dayData.f = (dayData.f || 0) + preset.f;
             
-            setDayData(currentDate, dayData);
-            updateDisplay(dayData);
-            showAlert(`Repas "${type}" ajouté!`, 'success');
+            appState.days[currentDate] = dayData;
+            saveState();
+            
+            document.getElementById('protein-input').value = dayData.p;
+            document.getElementById('carbs-input').value = dayData.c;
+            document.getElementById('fat-input').value = dayData.f;
+            
+            updateMacroDisplays();
         }
 
+        // Micronutrients
         function renderMicroCheckboxes() {
-            const categories = {
-                'fruits': { count: getGoal('fruits'), items: ['Pomme', 'Banane', 'Orange', 'Baies', 'Autre fruit'] },
-                'veg': { count: getGoal('veg'), items: ['Salade', 'Légumes verts', 'Légumes racines', 'Légumes colorés', 'Autre légume'] },
-                'legcere': { count: getGoal('legcere'), items: ['Lentilles', 'Pois chiches', 'Quinoa', 'Riz complet', 'Avoine'] },
-                'calcium': { count: getGoal('calcium'), items: ['Lait', 'Yaourt', 'Fromage', 'Lait végétal enrichi'] },
-                'nuts': { count: getGoal('nuts'), items: ['Amandes', 'Noix', 'Graines de lin', 'Graines de chia'] },
-                'water': { count: getGoal('water'), items: Array.from({length: 12}, (_, i) => `Verre ${i + 1}`) }
-            };
-
-            for (const [category, data] of Object.entries(categories)) {
-                const container = document.getElementById(`${category}-checks`);
+            const groups = ['fruits', 'veg', 'legcere', 'calcium', 'nuts', 'water'];
+            
+            groups.forEach(group => {
+                const container = document.getElementById(`${group}-checks`);
                 container.innerHTML = '';
                 
-                for (let i = 0; i < data.count; i++) {
+                const count = appState.goals.micro[group];
+                for (let i = 0; i < count; i++) {
                     const wrapper = document.createElement('div');
                     wrapper.className = 'checkbox-wrapper';
                     
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.id = `${category}-${i}`;
-                    checkbox.dataset.category = category;
-                    checkbox.dataset.index = i;
-                    checkbox.onchange = saveMicro;
+                    const input = document.createElement('input');
+                    input.type = 'checkbox';
+                    input.id = `${group}-${i}`;
+                    input.onchange = () => saveMicroCheckbox(group, i);
                     
-                    const custom = document.createElement('div');
-                    custom.className = 'checkbox-custom';
+                    const label = document.createElement('label');
+                    label.className = 'checkbox-custom';
+                    label.htmlFor = `${group}-${i}`;
                     
-                    wrapper.appendChild(checkbox);
-                    wrapper.appendChild(custom);
+                    wrapper.appendChild(input);
+                    wrapper.appendChild(label);
                     container.appendChild(wrapper);
                 }
+            });
+        }
+
+        function loadMicroCheckboxes() {
+            const dayData = getCurrentDayData();
+            const groups = ['fruits', 'veg', 'legcere', 'calcium', 'nuts', 'water'];
+            
+            groups.forEach(group => {
+                const count = dayData.micro[group] || 0;
+                const max = appState.goals.micro[group];
+                
+                for (let i = 0; i < max; i++) {
+                    const checkbox = document.getElementById(`${group}-${i}`);
+                    if (checkbox) {
+                        checkbox.checked = i < count;
+                    }
+                }
+                
+                // Update badge
+                document.getElementById(`${group}-badge`).textContent = `${count}/${max}`;
+            });
+        }
+
+        function saveMicroCheckbox(group, index) {
+            const dayData = getCurrentDayData();
+            if (!dayData.micro) dayData.micro = {};
+            
+            const max = appState.goals.micro[group];
+            let count = 0;
+            
+            for (let i = 0; i < max; i++) {
+                const checkbox = document.getElementById(`${group}-${i}`);
+                if (checkbox && checkbox.checked) count++;
             }
+            
+            dayData.micro[group] = Math.min(count, max);
+            appState.days[currentDate] = dayData;
+            saveState();
+            
+            // Update badge
+            document.getElementById(`${group}-badge`).textContent = `${count}/${max}`;
+        }
+
+        // Fish tracking
+        function getWeekStart(date) {
+            const d = new Date(date);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+            d.setDate(diff);
+            return d.toISOString().split('T')[0];
         }
 
         function renderFishCheckboxes() {
             const container = document.getElementById('fish-checks');
-            const count = getGoal('fish');
-            
             container.innerHTML = '';
             
+            const count = appState.goals.fishPerWeek;
             for (let i = 0; i < count; i++) {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'checkbox-wrapper';
                 
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.id = `fish-${i}`;
-                checkbox.dataset.category = 'fish';
-                checkbox.dataset.index = i;
-                checkbox.onchange = saveFish;
+                const input = document.createElement('input');
+                input.type = 'checkbox';
+                input.id = `fish-${i}`;
+                input.onchange = () => saveFishCheckbox(i);
                 
-                const custom = document.createElement('div');
-                custom.className = 'checkbox-custom';
+                const label = document.createElement('label');
+                label.className = 'checkbox-custom';
+                label.htmlFor = `fish-${i}`;
                 
-                wrapper.appendChild(checkbox);
-                wrapper.appendChild(custom);
+                wrapper.appendChild(input);
+                wrapper.appendChild(label);
                 container.appendChild(wrapper);
             }
         }
 
-        function saveMicro(event) {
-            const checkbox = event.target;
-            const category = checkbox.dataset.category;
-            const index = parseInt(checkbox.dataset.index);
-            
-            const dayData = getDayData(currentDate);
-            if (!dayData.micro) dayData.micro = {};
-            if (!dayData.micro[category]) dayData.micro[category] = [];
-            
-            if (checkbox.checked) {
-                dayData.micro[category][index] = true;
-            } else {
-                dayData.micro[category][index] = false;
-            }
-            
-            setDayData(currentDate, dayData);
-            updateMicroProgress(dayData);
-        }
-
-        function saveFish(event) {
-            const checkbox = event.target;
-            const index = parseInt(checkbox.dataset.index);
-            
+        function loadFishCheckboxes() {
             const weekStart = getWeekStart(currentDate);
-            const weekData = getWeekData(weekStart);
+            const fishCount = appState.fish[weekStart] || 0;
+            const max = appState.goals.fishPerWeek;
             
-            if (checkbox.checked) {
-                weekData.fish[index] = true;
-            } else {
-                weekData.fish[index] = false;
-            }
-            
-            setWeekData(weekStart, weekData);
-            updateFishProgress(getDayData(currentDate));
-        }
-
-        function updateMicroProgress(dayData) {
-            const categories = ['fruits', 'veg', 'legcere', 'calcium', 'nuts', 'water'];
-            
-            for (const category of categories) {
-                const goal = getGoal(category);
-                const completed = (dayData.micro && dayData.micro[category]) ? 
-                    dayData.micro[category].filter(Boolean).length : 0;
-                
-                document.getElementById(`${category}-badge`).textContent = `${completed}/${goal}`;
-                
-                for (let i = 0; i < goal; i++) {
-                    const checkbox = document.getElementById(`${category}-${i}`);
-                    if (checkbox) {
-                        checkbox.checked = dayData.micro && dayData.micro[category] && dayData.micro[category][i];
-                    }
-                }
-            }
-        }
-
-        function updateFishProgress(dayData) {
-            const weekStart = getWeekStart(currentDate);
-            const weekData = getWeekData(weekStart);
-            const goal = getGoal('fish');
-            const completed = weekData.fish ? weekData.fish.filter(Boolean).length : 0;
-            
-            for (let i = 0; i < goal; i++) {
+            for (let i = 0; i < max; i++) {
                 const checkbox = document.getElementById(`fish-${i}`);
                 if (checkbox) {
-                    checkbox.checked = weekData.fish && weekData.fish[i];
+                    checkbox.checked = i < fishCount;
                 }
             }
         }
 
-        function loadWeekView() {
-            const weekStart = document.getElementById('week-select').value;
-            const container = document.getElementById('week-view');
+        function saveFishCheckbox(index) {
+            const weekStart = getWeekStart(currentDate);
+            const max = appState.goals.fishPerWeek;
+            let count = 0;
             
-            container.innerHTML = '';
-            
-            for (let i = 0; i < 7; i++) {
-                const date = new Date(weekStart);
-                date.setDate(date.getDate() + i);
-                const dateStr = date.toISOString().split('T')[0];
-                const dayData = getDayData(dateStr);
-                
-                const dayCard = document.createElement('div');
-                dayCard.className = 'day-card';
-                
-                const calories = calculateCalories(dayData);
-                const progress = Math.round((calories / getGoal('calories')) * 100);
-                
-                dayCard.innerHTML = `
-                    <div class="day-header">${formatDate(dateStr)}</div>
-                    <div style="font-size: 24px; font-weight: 700; margin-bottom: 10px;">${calories} kcal</div>
-                    <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
-                        <div style="height: 100%; background: linear-gradient(90deg, #10b981, #6366f1); width: ${progress}%;"></div>
-                    </div>
-                    <div class="macro-badges">
-                        <span class="badge badge-p"><span class="badge-icon"></span> P: ${dayData.p || 0}g</span>
-                        <span class="badge badge-c"><span class="badge-icon"></span> C: ${dayData.c || 0}g</span>
-                        <span class="badge badge-f"><span class="badge-icon"></span> F: ${dayData.f || 0}g</span>
-                    </div>
-                    <a href="#" class="edit-link" onclick="goToDate('${dateStr}')">📝 Modifier</a>
-                `;
-                
-                container.appendChild(dayCard);
+            for (let i = 0; i < max; i++) {
+                const checkbox = document.getElementById(`fish-${i}`);
+                if (checkbox && checkbox.checked) count++;
             }
+            
+            appState.fish[weekStart] = count;
+            saveState();
         }
 
-        function goToDate(dateStr) {
-            currentDate = dateStr;
-            showTab('day');
-            loadDay();
-        }
-
+        // Week View
         function updateWeekSelector() {
-            const today = new Date();
-            const weekStart = getWeekStart(today.toISOString().split('T')[0]);
+            const weekStart = getWeekStart(new Date());
             document.getElementById('week-select').value = weekStart;
         }
 
         function goToCurrentWeek() {
-            const today = new Date().toISOString().split('T')[0];
-            const weekStart = getWeekStart(today);
-            document.getElementById('week-select').value = weekStart;
+            updateWeekSelector();
             loadWeekView();
         }
 
+        function loadWeekView() {
+            const weekSelect = document.getElementById('week-select');
+            if (!weekSelect.value) {
+                updateWeekSelector();
+            }
+            
+            const startDate = new Date(weekSelect.value);
+            const container = document.getElementById('week-view');
+            container.innerHTML = '';
+            
+            const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+            
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(startDate);
+                date.setDate(startDate.getDate() + i);
+                const dateStr = date.toISOString().split('T')[0];
+                const dayData = appState.days[dateStr] || { micro: {}, p: 0, c: 0, f: 0, extra: 0 };
+                
+                const calories = (dayData.p * 4) + (dayData.c * 4) + (dayData.f * 9) + dayData.extra;
+                
+                const card = document.createElement('div');
+                card.className = 'day-card';
+                
+                card.innerHTML = `
+                    <div class="day-header">${days[i]} ${date.getDate()}/${date.getMonth() + 1}</div>
+                    <div class="kpi-value">${Math.round(calories)} kcal</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${Math.min(100, (calories / appState.goals.cal) * 100)}%"></div>
+                    </div>
+                    <div class="macro-badges">
+                        <div class="badge badge-p">
+                            <span class="badge-icon"></span>
+                            P: ${dayData.p}/${appState.goals.p}g
+                        </div>
+                        <div class="badge badge-c">
+                            <span class="badge-icon"></span>
+                            G: ${dayData.c}/${appState.goals.c}g
+                        </div>
+                        <div class="badge badge-f">
+                            <span class="badge-icon"></span>
+                            L: ${dayData.f}/${appState.goals.f}g
+                        </div>
+                    </div>
+                    <div class="micro-badges">
+                        ${Object.keys(appState.goals.micro).map(key => {
+                            const value = dayData.micro[key] || 0;
+                            const goal = appState.goals.micro[key];
+                            const emoji = {
+                                fruits: '🍓',
+                                veg: '🥦',
+                                legcere: '🌾',
+                                calcium: '🥛',
+                                nuts: '🥜',
+                                water: '💧'
+                            }[key];
+                            return `<div class="badge">${emoji} ${value}/${goal}</div>`;
+                        }).join('')}
+                    </div>
+                    <a href="#" class="edit-link" onclick="editDay('${dateStr}'); return false;">→ Éditer</a>
+                `;
+                
+                container.appendChild(card);
+            }
+        }
+
+        function editDay(date) {
+            currentDate = date;
+            showTab('day');
+            document.querySelector('.nav-btn').click();
+            loadDay();
+        }
+
+        // Settings
+        function loadSettings() {
+            const goals = appState.goals;
+            
+            document.getElementById('goal-cal').value = goals.cal;
+            document.getElementById('goal-p').value = goals.p;
+            document.getElementById('goal-c').value = goals.c;
+            document.getElementById('goal-f').value = goals.f;
+            
+            document.getElementById('goal-fruits').value = goals.micro.fruits;
+            document.getElementById('goal-veg').value = goals.micro.veg;
+            document.getElementById('goal-legcere').value = goals.micro.legcere;
+            document.getElementById('goal-calcium').value = goals.micro.calcium;
+            document.getElementById('goal-nuts').value = goals.micro.nuts;
+            document.getElementById('goal-water').value = goals.micro.water;
+            document.getElementById('goal-fish').value = goals.fishPerWeek;
+        }
+
         function saveSettings() {
-            const goals = {
-                calories: parseInt(document.getElementById('goal-cal').value),
-                protein: parseInt(document.getElementById('goal-p').value),
-                carbs: parseInt(document.getElementById('goal-c').value),
-                fat: parseInt(document.getElementById('goal-f').value),
-                fruits: parseInt(document.getElementById('goal-fruits').value),
-                veg: parseInt(document.getElementById('goal-veg').value),
-                legcere: parseInt(document.getElementById('goal-legcere').value),
-                calcium: parseInt(document.getElementById('goal-calcium').value),
-                nuts: parseInt(document.getElementById('goal-nuts').value),
-                water: parseInt(document.getElementById('goal-water').value),
-                fish: parseInt(document.getElementById('goal-fish').value)
-            };
+            appState.goals.cal = parseInt(document.getElementById('goal-cal').value) || 2100;
+            appState.goals.p = parseInt(document.getElementById('goal-p').value) || 78;
+            appState.goals.c = parseInt(document.getElementById('goal-c').value) || 240;
+            appState.goals.f = parseInt(document.getElementById('goal-f').value) || 70;
             
-            appState.goals = goals;
+            appState.goals.micro.fruits = parseInt(document.getElementById('goal-fruits').value) || 2;
+            appState.goals.micro.veg = parseInt(document.getElementById('goal-veg').value) || 3;
+            appState.goals.micro.legcere = parseInt(document.getElementById('goal-legcere').value) || 1;
+            appState.goals.micro.calcium = parseInt(document.getElementById('goal-calcium').value) || 2;
+            appState.goals.micro.nuts = parseInt(document.getElementById('goal-nuts').value) || 1;
+            appState.goals.micro.water = parseInt(document.getElementById('goal-water').value) || 8;
+            appState.goals.fishPerWeek = parseInt(document.getElementById('goal-fish').value) || 2;
+            
             saveState();
-            
             renderMicroCheckboxes();
             renderFishCheckboxes();
             loadDay();
             
-            showAlert('Objectifs sauvegardés!', 'success');
+            showAlert('Objectifs sauvegardés avec succès!', 'success');
         }
 
         function resetDay() {
-            if (confirm('Êtes-vous sûr de vouloir réinitialiser les données de cette journée ?')) {
-                setDayData(currentDate, {});
+            if (confirm(`Réinitialiser les données du ${formatDate(currentDate)}?`)) {
+                delete appState.days[currentDate];
+                
+                const weekStart = getWeekStart(currentDate);
+                if (appState.fish[weekStart]) {
+                    appState.fish[weekStart] = 0;
+                }
+                
+                saveState();
                 loadDay();
                 showAlert('Journée réinitialisée!', 'success');
             }
         }
 
+        // Import/Export
         function exportData() {
             const dataStr = JSON.stringify(appState, null, 2);
-            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
             
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(dataBlob);
-            link.download = `nutritrack-backup-${new Date().toISOString().split('T')[0]}.json`;
-            link.click();
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'suivi-nutrition.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
             
-            showAlert('Données exportées!', 'success');
+            showAlert('Données exportées avec succès!', 'success');
         }
 
         function importData(event) {
@@ -1492,116 +1344,140 @@
             if (!file) return;
             
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = (e) => {
                 try {
-                    const importedState = JSON.parse(e.target.result);
-                    appState = importedState;
-                    saveState();
+                    const imported = JSON.parse(e.target.result);
                     
+                    // Validate structure
+                    if (!imported.goals || !imported.days) {
+                        throw new Error('Format invalide');
+                    }
+                    
+                    appState = imported;
+                    saveState();
                     loadDay();
+                    renderMicroCheckboxes();
+                    renderFishCheckboxes();
+                    
                     showAlert('Données importées avec succès!', 'success');
                 } catch (error) {
-                    showAlert('Erreur lors de l\'importation des données', 'error');
+                    showAlert('Erreur d\'import: ' + error.message, 'error');
                 }
             };
-            reader.readAsText(file);
             
-            event.target.value = '';
+            reader.readAsText(file);
         }
 
+        // Utilities
         function showAlert(message, type) {
             const alert = document.createElement('div');
             alert.className = `alert alert-${type}`;
-            alert.innerHTML = `
-                ${type === 'success' ? '✅' : '❌'} ${message}
-            `;
+            alert.textContent = message;
             
-            document.querySelector('.content').prepend(alert);
+            document.querySelector('.content').insertBefore(alert, document.querySelector('.content').firstChild);
             
             setTimeout(() => {
                 alert.remove();
             }, 3000);
         }
-
-        // Utility Functions
-        function calculateCalories(dayData) {
-            return ((dayData.p || 0) * 4) + ((dayData.c || 0) * 4) + ((dayData.f || 0) * 9) + (dayData.extra || 0);
+    </script>
+    
+    <!-- PWA Scripts -->
+    <script>
+    // Enregistrement du Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(registration => {
+                    console.log('Service Worker enregistré:', registration.scope);
+                    
+                    // Vérifier les mises à jour
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                showUpdateNotification();
+                            }
+                        });
+                    });
+                })
+                .catch(error => {
+                    console.error('Erreur Service Worker:', error);
+                });
+        });
+    }
+    
+    // Notification de mise à jour
+    function showUpdateNotification() {
+        showAlert('Une nouvelle version est disponible! Actualisez la page.', 'success');
+    }
+    
+    // Détection de l'installation PWA
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        showInstallButton();
+    });
+    
+    function showInstallButton() {
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            return;
         }
-
-        function getGoal(type) {
-            return appState.goals?.[type] || 
-                (type === 'calories' ? 2100 : 
-                 type === 'protein' ? 78 : 
-                 type === 'carbs' ? 240 : 
-                 type === 'fat' ? 70 : 
-                 type === 'fruits' ? 2 : 
-                 type === 'veg' ? 3 : 
-                 type === 'legcere' ? 1 : 
-                 type === 'calcium' ? 2 : 
-                 type === 'nuts' ? 1 : 
-                 type === 'water' ? 8 : 
-                 type === 'fish' ? 2 : 0);
-        }
-
-        function formatDate(dateStr) {
-            const date = new Date(dateStr);
-            const today = new Date().toISOString().split('T')[0];
-            
-            if (dateStr === today) {
-                return 'Aujourd\'hui';
+        
+        const installButton = document.createElement('button');
+        installButton.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            z-index: 9998;
+            transition: all 0.3s ease;
+        `;
+        installButton.innerHTML = '📱 Installer';
+        
+        installButton.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installButton.remove();
+                }
+                deferredPrompt = null;
             }
-            
-            return date.toLocaleDateString('fr-FR', {
-                weekday: 'short',
-                month: 'short',
-                day: 'numeric'
-            });
+        });
+        
+        document.body.appendChild(installButton);
+    }
+    
+    // Mode offline
+    window.addEventListener('online', () => console.log('En ligne'));
+    window.addEventListener('offline', () => {
+        showAlert('Mode hors ligne - Les données restent sauvegardées', 'success');
+    });
+    
+    // Vibration pour feedback tactile
+    function vibrate(pattern = [30]) {
+        if ('vibrate' in navigator) {
+            navigator.vibrate(pattern);
         }
-
-        function getWeekStart(dateStr) {
-            const date = new Date(dateStr);
-            const day = date.getDay();
-            const diff = date.getDate() - day + (day === 0 ? -6 : 1);
-            const weekStart = new Date(date.setDate(diff));
-            return weekStart.toISOString().split('T')[0];
-        }
-
-        function getDayData(date) {
-            return appState.days?.[date] || {};
-        }
-
-        function setDayData(date, data) {
-            if (!appState.days) appState.days = {};
-            appState.days[date] = data;
-            saveState();
-        }
-
-        function getWeekData(weekStart) {
-            return appState.weeks?.[weekStart] || { fish: [] };
-        }
-
-        function setWeekData(weekStart, data) {
-            if (!appState.weeks) appState.weeks = {};
-            appState.weeks[weekStart] = data;
-            saveState();
-        }
-
-        function loadState() {
-            try {
-                const saved = localStorage.getItem(APP_KEY);
-                return saved ? JSON.parse(saved) : { goals: {} };
-            } catch (error) {
-                return { goals: {} };
-            }
-        }
-
-        function saveState() {
-            try {
-                localStorage.setItem(APP_KEY, JSON.stringify(appState));
-            } catch (error) {
-                console.error('Erreur sauvegarde:', error);
-            }
-        }
+    }
+    
+    // Ajouter vibration aux boutons
+    document.addEventListener('DOMContentLoaded', () => {
+        const buttons = document.querySelectorAll('.btn-primary, .preset-btn, .nav-btn');
+        buttons.forEach(button => {
+            button.addEventListener('click', () => vibrate());
+        });
+    });
     </script>
 </body>
 </html>
