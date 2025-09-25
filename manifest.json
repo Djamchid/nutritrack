@@ -2,101 +2,24 @@
   "name": "NutriTrack - Suivi Nutrition",
   "short_name": "NutriTrack",
   "description": "Application de suivi nutritionnel pour micronutriments et macronutriments",
-  "start_url": "/index.html",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#667eea",
   "theme_color": "#6366f1",
   "orientation": "portrait",
-  "scope": "/",
   "categories": ["health", "fitness", "lifestyle"],
   "lang": "fr-FR",
-  "dir": "ltr",
   "icons": [
     {
-      "src": "icons/icon-72x72.png",
-      "sizes": "72x72",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "icons/icon-96x96.png",
-      "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "icons/icon-128x128.png",
-      "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "icons/icon-144x144.png",
-      "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "icons/icon-152x152.png",
-      "sizes": "152x152",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "icons/icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "icons/icon-384x384.png",
-      "sizes": "384x384",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "icons/icon-512x512.png",
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%236366f1'/><text x='256' y='320' font-size='200' text-anchor='middle' fill='white'>🥗</text></svg>",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable any"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "screenshots/home.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "label": "Écran d'accueil - Suivi quotidien"
+      "type": "image/svg+xml"
     },
     {
-      "src": "screenshots/week.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "label": "Vue hebdomadaire"
-    },
-    {
-      "src": "screenshots/settings.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "label": "Paramètres et objectifs"
+      "src": "data:image/png;base64,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",
+      "sizes": "192x192",
+      "type": "image/png"
     }
-  ],
-  "shortcuts": [
-    {
-      "name": "Ajouter un repas",
-      "short_name": "Repas",
-      "description": "Ajouter rapidement un repas",
-      "url": "/index.html?action=add-meal",
-      "icons": [{ "src": "icons/meal.png", "sizes": "96x96" }]
-    },
-    {
-      "name": "Vue semaine",
-      "short_name": "Semaine",
-      "description": "Voir le résumé hebdomadaire",
-      "url": "/index.html?tab=week",
-      "icons": [{ "src": "icons/week.png", "sizes": "96x96" }]
-    }
-  ],
-  "prefer_related_applications": false,
-  "related_applications": []
+  ]
 }
